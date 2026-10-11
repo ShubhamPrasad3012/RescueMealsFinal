@@ -97,8 +97,8 @@ module.exports = function(router){
                         from: '"RescueMeals Support" <Support@rescuemeals.com>',
                         to: user.email,
                         subject: 'Activation Link - RescueMeals Registration',
-                        text: 'Hello '+ user.name + 'Thank you for registering with us.Please find the below activation link Activation link Thank you Arpit Jaswal MD, RescueMeals',
-                        html: 'Hello <strong>'+ user.name + '</strong>,<br><br>Thank you for registering with us.Please find the below activation link<br><br><a href="http://rescuemeals.onrender.com/activate/'+ user.temporarytoken+'">Activation link</a><br><br>Thank you<br>Arpit Jaswal <br>MD, RescueMeals'
+                        text: 'Hello '+ user.name + 'Thank you for registering with us.Please find the below activation link Activation link RescueMeals',
+                        html: 'Hello <strong>'+ user.name + '</strong>,<br><br>Thank you for registering with us.Please find the below activation link<br><br><a href="http://rescuemeals.onrender.com/activate/'+ user.temporarytoken+'">Activation link</a><br><br>Thank you<br> <br>MD, RescueMeals'
                     };
 
                     transporter.sendMail(email, function(err, info){
@@ -250,8 +250,8 @@ module.exports = function(router){
                             from: 'RescueMeals Registration, support@RescueMeals.com',
                             to: user.email,
                             subject: 'Activation Link Request - RescueMeals Registration',
-                            text: 'Hello '+ user.name + 'You requested for a new account activation link. Please find the below activation link Activation link Thank you Arpit Jaswal MD, RescueMeals',
-                            html: 'Hello <strong>'+ user.name + '</strong>,<br><br>You requested for a new account activation link. Please find the below activation link<br><br><a href="http://rescuemeals.onrender.com/activate/'+ user.temporarytoken+'">Activation link</a><br><br>Thank you<br>Arpit Jaswal <br>MD, RescueMeals'
+                            text: 'Hello '+ user.name + 'You requested for a new account activation link. Please find the below activation link Activation link Thank you  MD, RescueMeals',
+                            html: 'Hello <strong>'+ user.name + '</strong>,<br><br>You requested for a new account activation link. Please find the below activation link<br><br><a href="http://rescuemeals.onrender.com/activate/'+ user.temporarytoken+'">Activation link</a><br><br>Thank you<br> <br>MD, RescueMeals'
                         };
 
                         transporter.sendMail(email, function(err, info){
@@ -294,8 +294,8 @@ module.exports = function(router){
                             from: 'RescueMeals, support@RescueMeals.com',
                             to: user.email,
                             subject: 'Reset Username Request - RescueMeals Registration',
-                            text: 'Hello ' + user.name + 'You requested for the username. Your username is ' + user.username + ' Thank you Arpit Jaswal MD, RescueMeals',
-                            html: 'Hello <strong>' + user.name + '</strong>,<br><br>You requested for the username. Your username is <strong>' + user.username + '</strong><br><br>Thank you<br>Arpit Jaswal <br>MD, RescueMeals'
+                            text: 'Hello ' + user.name + 'You requested for the username. Your username is ' + user.username + ' Thank you, RescueMeals',
+                            html: 'Hello <strong>' + user.name + '</strong>,<br><br>You requested for the username. Your username is <strong>' + user.username + '</strong><br><br>Thank you<br> <br>MD, RescueMeals'
                         };
 
                         transporter.sendMail(email, function (err, info) {
@@ -346,8 +346,8 @@ module.exports = function(router){
                                 from: 'RescueMeals, support@RescueMeals.com',
                                 to: user.email,
                                 subject: 'Reset Password Link - RescueMeals',
-                                text: 'Hello '+ user.name + 'You requested for the reset password.Please find the below reset password link Reset Password link Thank you Arpit Jaswal MD, RescueMeals',
-                                html: 'Hello <strong>'+ user.name + '</strong>,<br><br>You requested for the reset password.Please find the below reset password link <br><br><a href="http://rescuemeals.onrender.com/changepassword/'+ user.temporarytoken+'">Reset Password link</a><br><br>Thank you<br>Arpit Jaswal <br>MD, RescueMeals'
+                                text: 'Hello '+ user.name + 'You requested for the reset password.Please find the below reset password link Reset Password link Thank you, RescueMeals',
+                                html: 'Hello <strong>'+ user.name + '</strong>,<br><br>You requested for the reset password.Please find the below reset password link <br><br><a href="http://rescuemeals.onrender.com/changepassword/'+ user.temporarytoken+'">Reset Password link</a><br><br>Thank you<br> <br>MD, RescueMeals'
                             };
 
                             transporter.sendMail(email, function(err, info){
@@ -404,8 +404,8 @@ module.exports = function(router){
                                     from: 'RescueMeals, support@RescueMeals.com',
                                     to: user.email,
                                     subject: 'Password changed - RescueMeals',
-                                    text: 'Hello ' + user.name + 'Your account has been activated. Thank you Arpit Jaswal MD, RescueMeals',
-                                    html: 'Hello <strong>' + user.name + '</strong>,<br><br>Your account has been activated<br><br>Thank you<br>Arpit Jaswal <br>MD, RescueMeals'
+                                    text: 'Hello ' + user.name + 'Your account has been activated. Thank you , RescueMeals',
+                                    html: 'Hello <strong>' + user.name + '</strong>,<br><br>Your account has been activated<br><br>Thank you<br> <br>MD, RescueMeals'
                                 };
 
                                 transporter.sendMail(email, function (err, info) {
@@ -509,8 +509,8 @@ module.exports = function(router){
                                     from: 'RescueMeals Registration, support@RescueMeals.com',
                                     to: user.email,
                                     subject: 'Account Activated - RescueMeals Registration',
-                                    text: 'Hello '+ user.name + 'Your account has been activated. Thank you Arpit Jaswal MD, RescueMeals',
-                                    html: 'Hello <strong>'+ user.name + '</strong>,<br><br>Your account has been activated<br><br>Thank you<br>Arpit Jaswal <br>MD, RescueMeals'
+                                    text: 'Hello '+ user.name + 'Your account has been activated. Thank you , RescueMeals',
+                                    html: 'Hello <strong>'+ user.name + '</strong>,<br><br>Your account has been activated<br><br>Thank you<br> <br>MD, RescueMeals'
                                 };
 
                                 transporter.sendMail(email, function(err, info){

@@ -45,12 +45,7 @@ RescueMeals not only tackles the pressing issue of food wastage but also harness
 - **Email Service**: Nodemailer
 - **Styling**: CSS with Bootstrap
 - **Deployment**: Heroku for backend, Vercel for frontend
-
-## Getting Started
-1. Clone the repository: `git clone https://github.com/arpitjaswal/RescueMeals.git`
-2. Navigate to the project folder: `cd RescueMeals`
-3. Install dependencies: `npm install`
-4. Run the server: `npm start` (in the project root)
+  
 
 ## Video Demonstration
 
