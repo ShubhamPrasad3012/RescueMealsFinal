@@ -69,26 +69,46 @@ module.exports = function(router){
         await user.save();
 
         if (user.role === 'receiver') {
-            await Recipient.create({
-                name: user.name,
-                city: req.body.city,
-                state: req.body.state,
-                dailyMealDemand: 0,
-                mealsReceivedToday: 0,
-                receivingCapacity: 100,
-                active: true
-            });
+            const coordinates = await require('../utils/geocoding').geocodeAddress(
+    '',
+    req.body.city,
+    req.body.state
+);
+
+await Recipient.create({
+    name: user.name,
+    city: req.body.city,
+    state: req.body.state,
+    location: {
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude
+    },
+    dailyMealDemand: 100,
+    mealsReceivedToday: 0,
+    receivingCapacity: 100,
+    active: true
+});
         }
 
         if (user.role === 'volunteer') {
-            await Volunteer.create({
-                name: user.name,
-                city: req.body.city,
-                state: req.body.state,
-                available: true,
-                coverageRadiusKm: 10,
-                carryingCapacity: 50
-            });
+            const coordinates = await require('../utils/geocoding').geocodeAddress(
+    '',
+    req.body.city,
+    req.body.state
+);
+
+await Volunteer.create({
+    name: user.name,
+    city: req.body.city,
+    state: req.body.state,
+    location: {
+        latitude: coordinates.latitude,
+        longitude: coordinates.longitude
+    },
+    available: true,
+    coverageRadiusKm: 10,
+    carryingCapacity: 50
+});
         }
 
         var email = {
