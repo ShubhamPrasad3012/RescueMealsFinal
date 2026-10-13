@@ -182,6 +182,27 @@ var app = angular.module('appRoutes',['ngRoute'])
 		controller : 'orderplacedCtrl'
     })
 
+	.when('/priority-dashboard', {
+		templateUrl: 'app/views/priority-dashboard.html',
+		controller: 'priorityDashboardCtrl',
+		controllerAs: 'priorityDashboard',
+		authenticated: true
+	})
+
+	.when('/priority-recipients', {
+    templateUrl: 'app/views/priority-recipients.html',
+    controller: 'recipientManagementCtrl',
+    controllerAs: 'recipients',
+    authenticated: true
+})
+
+.when('/priority-volunteers', {
+    templateUrl: 'app/views/priority-volunteers.html',
+    controller: 'volunteerManagementCtrl',
+    controllerAs: 'volunteers',
+    authenticated: true
+})
+
 
 	.otherwise({redirectTo:'/'});
 
@@ -195,7 +216,7 @@ app.run(['$rootScope','Auth','$location',function($rootScope, Auth , $location){
     $rootScope.$on('$routeChangeStart',function(event,next,current){
     	// console.log(next.$$route);
 
-        if(next.$$route.authenticated == true)
+        if(next && next.$$route && next.$$route.authenticated)
         {
             if(!Auth.isLoggedIn()){
             	event.preventDefault();

@@ -126,7 +126,7 @@ angular.module('userControllers',['userServices'])
     app.addData = function(rawfoodData){
 
         //console.log(app.rawfoodData);
-        User.donaterawfood(app.rawfoodData).then(function(data){
+        User.donaterawfood(rawfoodData).then(function(data){
             console.log(data);
             if(data.data.success){
                 app.successMsg = data.data.message;
@@ -147,7 +147,7 @@ angular.module('userControllers',['userServices'])
     app.addFood = function(foodData){
 
         //console.log(app.foodData);
-        User.donateCookedFood(app.foodData).then(function(data){
+        User.donateCookedFood(foodData).then(function(data){
             console.log(data);
             if(data.data.success){
                 app.successMsg = data.data.message;

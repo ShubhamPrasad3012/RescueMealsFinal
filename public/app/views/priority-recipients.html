@@ -1,0 +1,98 @@
+
+<div class="container">
+    <h2>Recipient Management</h2>
+    <p>Register and manage food recipients.</p>
+
+    <div class="alert alert-danger" ng-if="recipients.error">
+        {{recipients.error}}
+    </div>
+    <div class="alert alert-success" ng-if="recipients.success">
+        {{recipients.success}}
+    </div>
+
+    <h3>Register Recipient</h3>
+
+    <form ng-submit="recipients.add()">
+        <label>Name</label>
+        <input class="form-control" ng-model="recipients.form.name" required>
+
+        <label>City</label>
+        <input class="form-control" ng-model="recipients.form.city" required>
+
+        <label>State</label>
+        <input class="form-control" ng-model="recipients.form.state" required>
+
+        <label>Address (optional)</label>
+        <input class="form-control" ng-model="recipients.form.address">
+
+        <label>Daily Meal Demand</label>
+        <input class="form-control" type="number" min="0"
+               ng-model="recipients.form.dailyMealDemand" required>
+
+        <label>Receiving Capacity</label>
+        <input class="form-control" type="number" min="0"
+               ng-model="recipients.form.receivingCapacity" required>
+
+        <br>
+        <button class="btn btn-primary" type="submit">
+            Register Recipient
+        </button>
+    </form>
+
+    <hr>
+
+    <h3>Registered Recipients</h3>
+    <button class="btn btn-default" ng-click="recipients.load()">
+        Refresh
+    </button>
+
+    <p ng-if="recipients.loading">Loading recipients...</p>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Daily Demand</th>
+                    <th>Meals Received</th>
+                    <th>Capacity</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in recipients.items track by item._id">
+                    <td>{{item.name}}</td>
+                    <td>{{item.city}}, {{item.state}}</td>
+                    <td>{{item.dailyMealDemand}}</td>
+                    <td>
+                        <input class="form-control" type="number" min="0"
+                               ng-model="item.mealsReceivedToday">
+                    </td>
+                    <td>
+                        <input class="form-control" type="number" min="0"
+                               ng-model="item.receivingCapacity">
+                    </td>
+                    <td>{{item.active ? 'Active' : 'Inactive'}}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary"
+                                ng-click="recipients.update(item, {
+                                    mealsReceivedToday: item.mealsReceivedToday,
+                                    receivingCapacity: item.receivingCapacity
+                                })">
+                            Save
+                        </button>
+
+                        <button class="btn btn-sm btn-warning"
+                                ng-click="recipients.update(item, {
+                                    active: !item.active
+                                })">
+                            {{item.active ? 'Deactivate' : 'Activate'}}
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

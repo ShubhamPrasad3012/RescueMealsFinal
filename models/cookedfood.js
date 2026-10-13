@@ -63,12 +63,11 @@ var cookedfoodSchema = new Schema( {
     acceptedby: {
         type: String,
         default: 'none'
-    },
-    // Add expiration date for food safety
+    }, 
     expiryDate: {
         type: Date,
         required: false
     }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Cookedfood',cookedfoodSchema);

@@ -71,7 +71,7 @@ var rawitemsSchema = new Schema({
         type: Date,
         required: false
     }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Rawitems',rawitemsSchema);
 

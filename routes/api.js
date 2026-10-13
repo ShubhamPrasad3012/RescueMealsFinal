@@ -4,9 +4,10 @@ var Cookedfood  = require('../models/cookedfood.js');
 var Product     = require('../models/product.js');
 var jwt         = require('jsonwebtoken');
 var nodemailer  = require('nodemailer');
-var secret      = 'Pankaj';
+var secret      = 'Sufi';
 var geocoding   = require('../utils/geocoding.js');
-
+const Recipient = require('../models/Recipient');
+const Volunteer = require('../models/Volunteer');
 var transporter = nodemailer.createTransport({
     service : 'gmail',
     auth: {
@@ -19,105 +20,124 @@ module.exports = function(router){
 
     //register route
 
-	router.post('/users',function(req,res){
-        var user = new User();
+	router.post('/users', async function(req, res) {
+    var user = new User();
 
-        user.username = req.body.username;
-        user.password = req.body.password;
-        user.email = req.body.email;
-        user.name = req.body.name;
-        user.role = req.body.role;
-        user.institute = req.body.institute;
-        user.temporarytoken = jwt.sign({username: user.username, email:user.email},secret,{expiresIn: '24h'});
-        if(req.body.username == null || req.body.password == null || req.body.email == null || req.body.role == null || req.body.name == null || req.body.username == "" || req.body.password == "" || req.body.email == "" || req.body.name == "" || req.body.role == "")
-        {
-             //res.send("Make sure all fields are provided");
-            res.json({ success:false , message:'Make sure all fields are provided'});
-        }
-        else {
-            user.save(function(err) {
-                if(err) {
-                    if(err.errors != null) {
-                        // validation errors
-                        if(err.errors.name) {
-                            res.json({
-                                success: false,
-                                message: err.errors.name.message
-                            });
-                        } else if (err.errors.email) {
-                            res.json({
-                                success : false,
-                                message : err.errors.email.message
-                            });
-                        } else if(err.errors.password) {
-                            res.json({
-                                success : false,
-                                message : err.errors.password.message
-                            });
-                        } else {
-                            res.json({
-                                success : false,
-                                message : err
-                            });
-                        }
-                    } else {
-                        // duplication errors
-                        if(err.code === 11000) {
-                            //console.log(err.errmsg);
-                            if(err.errmsg[70] === 'e') {
-                                res.json({
-                                    success: false,
-                                    message: 'Email is already registered.'
-                                });
-                            } else if(err.errmsg[70] === 'u') {
-                                res.json({
-                                    success : false,
-                                    message : 'Username is already registered.'
-                                });
-                            } else {
-                                res.json({
-                                    success : false,
-                                    message : err
-                                });
-                            }
-                        } else {
-                            res.json({
-                                success: false,
-                                message: err
-                            })
-                        }
-                    }
-                }
+    user.username = req.body.username;
+    user.password = req.body.password;
+    user.email = req.body.email;
+    user.name = req.body.name;
+    user.role = req.body.role;
+    user.institute = req.body.institute;
+    user.temporarytoken = jwt.sign(
+        { username: user.username, email: user.email },
+        secret,
+        { expiresIn: '24h' }
+    );
 
+    if (
+        !req.body.username || !req.body.password ||
+        !req.body.email || !req.body.role ||
+        !req.body.name || !req.body.institute
+    ) {
+        return res.json({
+            success: false,
+            message: 'Make sure all fields are provided'
+        });
+    }
 
+    if (
+        ['donator', 'receiver', 'volunteer'].indexOf(user.role) === -1
+    ) {
+        return res.json({
+            success: false,
+            message: 'Invalid role selected'
+        });
+    }
 
-               else {
-                    //res.send("User created");
-                    var email = {
-                        from: '"RescueMeals Support" <Support@rescuemeals.com>',
-                        to: user.email,
-                        subject: 'Activation Link - RescueMeals Registration',
-                        text: 'Hello '+ user.name + 'Thank you for registering with us.Please find the below activation link Activation link RescueMeals',
-                        html: 'Hello <strong>'+ user.name + '</strong>,<br><br>Thank you for registering with us.Please find the below activation link<br><br><a href="http://rescuemeals.onrender.com/activate/'+ user.temporarytoken+'">Activation link</a><br><br>Thank you<br> <br>MD, RescueMeals'
-                    };
+    if (
+        (user.role === 'receiver' || user.role === 'volunteer') &&
+        (!req.body.city || !req.body.state)
+    ) {
+        return res.json({
+            success: false,
+            message: 'City and state are required for receivers and volunteers'
+        });
+    }
 
-                    transporter.sendMail(email, function(err, info){
-                        if (err ){
-                            console.log(err);
-                        }
-                        else {
-                            console.log('Message sent: ' + info.response);
-                        }
-                    });
+    try {
+        await user.save();
 
-                    res.json({
-    success: true,
-    message: 'Account registered successfully. You can now log in.'
-});
-                }
+        if (user.role === 'receiver') {
+            await Recipient.create({
+                name: user.name,
+                city: req.body.city,
+                state: req.body.state,
+                dailyMealDemand: 0,
+                mealsReceivedToday: 0,
+                receivingCapacity: 100,
+                active: true
             });
         }
-	});
+
+        if (user.role === 'volunteer') {
+            await Volunteer.create({
+                name: user.name,
+                city: req.body.city,
+                state: req.body.state,
+                available: true,
+                coverageRadiusKm: 10,
+                carryingCapacity: 50
+            });
+        }
+
+        var email = {
+            from: '"RescueMeals Support" <Support@rescuemeals.com>',
+            to: user.email,
+            subject: 'Activation Link - RescueMeals Registration',
+            text: 'Hello ' + user.name +
+                ', thank you for registering with RescueMeals.',
+            html: 'Hello <strong>' + user.name +
+                '</strong>,<br><br>Thank you for registering with us.' +
+                '<br><br><a href="http://rescuemeals.onrender.com/activate/' +
+                user.temporarytoken +
+                '">Activation link</a><br><br>Thank you<br>RescueMeals'
+        };
+
+        transporter.sendMail(email, function(err, info) {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log('Message sent: ' + info.response);
+            }
+        });
+
+        return res.json({
+            success: true,
+            message: 'Account registered successfully. You can now log in.'
+        });
+
+    } catch (err) {
+        console.error('Registration error:', err);
+
+        // Remove the user if creating their role-specific record fails.
+        if (user._id) {
+            await User.deleteOne({ _id: user._id }).catch(console.error);
+        }
+
+        if (err.code === 11000) {
+            return res.status(409).json({
+                success: false,
+                message: 'Username or email is already registered.'
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: 'Registration failed: ' + err.message
+        });
+    }
+});
 
 	//check username
 
@@ -554,7 +574,7 @@ module.exports = function(router){
             res.json({success:false, message:"Token not provided"});
         }
 	});
-
+    require("./priorityRoutes")(router);
     router.post('/me', function (req,res) {
 
         //console.log(req.decoded.email);
@@ -575,6 +595,15 @@ module.exports = function(router){
     router.post('/donaterawfood', function (req,res) {
 
         var food = new Rawitems();
+        var expiryDate = new Date(req.body.expiryDate);
+
+if (!req.body.expiryDate || isNaN(expiryDate.getTime()) ||
+    expiryDate <= new Date()) {
+    return res.json({
+        success: false,
+        message: 'Please provide a valid future food expiry date and time.'
+    });
+}
         food.name = req.body.name;
         food.quantity = req.body.quantity;
         food.city = req.body.city;
@@ -587,9 +616,7 @@ module.exports = function(router){
         }
         
         // Add expiry date if provided
-        if (req.body.expiryDate) {
-            food.expiryDate = new Date(req.body.expiryDate);
-        }
+        cookedfood.expiryDate = expiryDate;
         
         // Add address if provided
         if (req.body.address) {
@@ -650,7 +677,15 @@ module.exports = function(router){
 
     // route to post data of donating cooked food
     router.post('/donateCookedFood', function (req,res) {
+        var expiryDate = new Date(req.body.expiryDate);
 
+if (!req.body.expiryDate || isNaN(expiryDate.getTime()) ||
+    expiryDate <= new Date()) {
+    return res.json({
+        success: false,
+        message: 'Please provide a valid future food expiry date and time.'
+    });
+}
         if(!req.body.meal || !req.body.people || !req.body.city || !req.body.state) {
             res.json({
                 success : false,
@@ -665,11 +700,7 @@ module.exports = function(router){
             cookedfood.state = req.body.state;
             cookedfood.postedby = req.decoded.username;
             
-            // Add expiry date if provided
-            if (req.body.expiryDate) {
-                cookedfood.expiryDate = new Date(req.body.expiryDate);
-            }
-            
+            cookedfood.expiryDate = expiryDate;
             // Add address if provided
             if (req.body.address) {
                 cookedfood.address = req.body.address;

@@ -43,6 +43,8 @@
     <script src="app/controllers/userCtrl.js"></script>
     <script src="app/controllers/mainCtrl.js"></script>
     <script src="app/controllers/emailCtrl.js"></script>
+    <script src="app/controllers/priorityCtrl.js"></script>
+    <script src="app/controllers/managementCtrl.js"></script>
 
     <script src="app/services/userServices.js"></script>
     <script src="app/services/authServices.js"></script>
@@ -105,6 +107,13 @@
                         <li><a ng-show="!main.isLoggedIn" href="/register" style="color:white;"><span class="glyphicon glyphicon-log-in"></span> Sign Up</a></li>
                         <li><a ng-show="!main.isLoggedIn" href="/login" style="color:white;"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
                         <li><a ng-show="main.isLoggedIn" href="/team" style="color:white;"><span class="glyphicon glyphicon-user"></span> Team</a></li>
+                       <li ng-show="main.isLoggedIn">
+    <a href="/priority-dashboard" style="color:white;">
+        <span class="glyphicon glyphicon-stats"></span>
+        Priority Dashboard
+    </a>
+</li>
+
                         <li><a ng-show="main.isLoggedIn" href="/profile" style="color:white;"><span class="glyphicon glyphicon-user"></span>  Hello {{main.username}}</a></li>
                         <li><a style="color:white;" href="/cart" ng-show="main.isLoggedIn && !main.isReceiver"><span class="glyphicon glyphicon-log-in"></span>  Cart</a></li>
                         <li><a style="color:white;" href="#" ng-click="main.logout();" ng-show="main.isLoggedIn"><span class="glyphicon glyphicon-log-in"></span>  Logout</a></li>

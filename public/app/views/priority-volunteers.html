@@ -1,0 +1,90 @@
+
+<div class="container">
+    <h2>Volunteer Management</h2>
+    <p>Register volunteers and manage their availability.</p>
+
+    <div class="alert alert-danger" ng-if="volunteers.error">
+        {{volunteers.error}}
+    </div>
+    <div class="alert alert-success" ng-if="volunteers.success">
+        {{volunteers.success}}
+    </div>
+
+    <h3>Register Volunteer</h3>
+
+    <form ng-submit="volunteers.add()">
+        <label>Name</label>
+        <input class="form-control" ng-model="volunteers.form.name" required>
+
+        <label>City</label>
+        <input class="form-control" ng-model="volunteers.form.city" required>
+
+        <label>State</label>
+        <input class="form-control" ng-model="volunteers.form.state" required>
+
+        <label>Address (optional)</label>
+        <input class="form-control" ng-model="volunteers.form.address">
+
+        <label>Coverage Radius (km)</label>
+        <input class="form-control" type="number" min="0"
+               ng-model="volunteers.form.coverageRadiusKm" required>
+
+        <label>Carrying Capacity (meals)</label>
+        <input class="form-control" type="number" min="0"
+               ng-model="volunteers.form.carryingCapacity" required>
+
+        <br>
+        <button class="btn btn-primary" type="submit">
+            Register Volunteer
+        </button>
+    </form>
+
+    <hr>
+
+    <h3>Registered Volunteers</h3>
+    <button class="btn btn-default" ng-click="volunteers.load()">
+        Refresh
+    </button>
+
+    <p ng-if="volunteers.loading">Loading volunteers...</p>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Location</th>
+                    <th>Coverage (km)</th>
+                    <th>Carrying Capacity</th>
+                    <th>Availability</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="item in volunteers.items track by item._id">
+                    <td>{{item.name}}</td>
+                    <td>{{item.city}}, {{item.state}}</td>
+                    <td>{{item.coverageRadiusKm}}</td>
+                    <td>{{item.carryingCapacity}}</td>
+                    <td>{{item.available ? 'Available' : 'Unavailable'}}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning"
+                                ng-click="volunteers.update(item, {
+                                    available: !item.available
+                                })">
+                            {{item.available ? 'Mark Unavailable' : 'Mark Available'}}
+                        </button>
+
+                        <button class="btn btn-sm btn-primary"
+                                ng-click="volunteers.update(item, {
+                                    coverageRadiusKm: item.coverageRadiusKm,
+                                    carryingCapacity: item.carryingCapacity
+                                })">
+                            Save
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

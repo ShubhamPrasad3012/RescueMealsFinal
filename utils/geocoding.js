@@ -1,105 +1,141 @@
-/**
- * Geocoding Utility Functions
- * 
- * This module provides utility functions for geocoding addresses and calculating distances
- * between locations to enhance the food donation and collection process.
- */
 
-/**
- * Geocodes an address to get latitude and longitude
- * 
- * @param {string} address - The full address to geocode
- * @param {string} city - The city name
- * @param {string} state - The state name
- * @returns {Promise<Object>} - A promise that resolves to an object with lat and lng
- */
+const CITY_COORDINATES = {
+  "vellore, tamil nadu": {
+    latitude: 12.9165,
+    longitude: 79.1325
+  },
+  "chennai, tamil nadu": {
+    latitude: 13.0827,
+    longitude: 80.2707
+  },
+  "bengaluru, karnataka": {
+    latitude: 12.9716,
+    longitude: 77.5946
+  },
+  "bangalore, karnataka": {
+    latitude: 12.9716,
+    longitude: 77.5946
+  },
+  "hyderabad, telangana": {
+    latitude: 17.3850,
+    longitude: 78.4867
+  },
+  "mumbai, maharashtra": {
+    latitude: 19.0760,
+    longitude: 72.8777
+  },
+  "new delhi, delhi": {
+    latitude: 28.6139,
+    longitude: 77.2090
+  }
+};
+
 function geocodeAddress(address, city, state) {
-    return new Promise((resolve, reject) => {
-        // In a real implementation, this would call a geocoding API
-        // For now, we'll simulate a successful geocoding with mock data
-        
-        // Simulate API call delay
-        setTimeout(() => {
-            // This is a mock implementation
-            // In production, you would use a service like Google Maps Geocoding API
-            
-            // Mock successful geocoding
-            if (city && state) {
-                // Return mock coordinates (this would be real geocoding in production)
-                resolve({
-                    latitude: parseFloat((Math.random() * 10 + 30).toFixed(6)),
-                    longitude: parseFloat((Math.random() * 10 + 70).toFixed(6)),
-                    formattedAddress: address || `${city}, ${state}`
-                });
-            } else {
-                reject(new Error('City and state are required for geocoding'));
-            }
-        }, 100);
-    });
-}
-
-/**
- * Calculates the distance between two points using the Haversine formula
- * 
- * @param {number} lat1 - Latitude of first point
- * @param {number} lon1 - Longitude of first point
- * @param {number} lat2 - Latitude of second point
- * @param {number} lon2 - Longitude of second point
- * @returns {number} - Distance in kilometers
- */
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    // Haversine formula to calculate distance between two points on Earth
-    const R = 6371; // Radius of the Earth in km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    
-    const a = 
-        Math.sin(dLat/2) * Math.sin(dLat/2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-        Math.sin(dLon/2) * Math.sin(dLon/2);
-    
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    const distance = R * c; // Distance in km
-    
-    return distance;
-}
-
-/**
- * Finds nearby donations based on user location
- * 
- * @param {Object} userLocation - User's location with latitude and longitude
- * @param {Array} donations - Array of donation objects with location data
- * @param {number} maxDistance - Maximum distance in kilometers
- * @returns {Array} - Filtered array of nearby donations with distance added
- */
-function findNearbyDonations(userLocation, donations, maxDistance = 10) {
-    if (!userLocation || !userLocation.latitude || !userLocation.longitude) {
-        return donations; // Return all donations if no location provided
+  return new Promise((resolve, reject) => {
+    if (!city || !state) {
+      return reject(
+        new Error("City and state are required for location lookup")
+      );
     }
-    
-    return donations.filter(donation => {
-        if (!donation.location || !donation.location.latitude || !donation.location.longitude) {
-            return false; // Skip donations without location data
-        }
-        
-        // Calculate distance
-        const distance = calculateDistance(
-            userLocation.latitude,
-            userLocation.longitude,
-            donation.location.latitude,
-            donation.location.longitude
-        );
-        
-        // Add distance to donation object
-        donation.distance = parseFloat(distance.toFixed(2));
-        
-        // Return true if within maxDistance
-        return distance <= maxDistance;
-    }).sort((a, b) => a.distance - b.distance); // Sort by distance
+
+    const key = `${city.trim()}, ${state.trim()}`.toLowerCase();
+    const coordinates = CITY_COORDINATES[key];
+
+    if (!coordinates) {
+      return reject(
+        new Error(
+          `No approximate coordinates configured for ${city}, ${state}`
+        )
+      );
+    }
+
+    resolve({
+      ...coordinates,
+      formattedAddress: address || `${city}, ${state}`,
+      precision: "city-centre"
+    });
+  });
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const values = [lat1, lon1, lat2, lon2].map(Number);
+
+  if (!values.every(Number.isFinite)) {
+    throw new Error("Valid coordinates are required");
+  }
+
+  const [latitude1, longitude1, latitude2, longitude2] = values;
+
+  if (
+    Math.abs(latitude1) > 90 ||
+    Math.abs(latitude2) > 90 ||
+    Math.abs(longitude1) > 180 ||
+    Math.abs(longitude2) > 180
+  ) {
+    throw new Error("Coordinates are outside valid ranges");
+  }
+
+  const radians = degrees => degrees * Math.PI / 180;
+  const dLat = radians(latitude2 - latitude1);
+  const dLon = radians(longitude2 - longitude1);
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(radians(latitude1)) *
+    Math.cos(radians(latitude2)) *
+    Math.sin(dLon / 2) ** 2;
+
+  return 6371 * 2 * Math.atan2(
+    Math.sqrt(a),
+    Math.sqrt(1 - a)
+  );
+}
+
+function findNearbyDonations(
+  userLocation,
+  donations,
+  maxDistance = 10
+) {
+  if (
+    !userLocation ||
+    !Number.isFinite(Number(userLocation.latitude)) ||
+    !Number.isFinite(Number(userLocation.longitude))
+  ) {
+    return [];
+  }
+
+  return donations
+    .filter(donation => donation.location)
+    .map(donation => {
+      const location = donation.location.type || donation.location;
+
+      if (
+        !Number.isFinite(Number(location.latitude)) ||
+        !Number.isFinite(Number(location.longitude))
+      ) {
+        return null;
+      }
+
+      const distance = calculateDistance(
+        Number(userLocation.latitude),
+        Number(userLocation.longitude),
+        Number(location.latitude),
+        Number(location.longitude)
+      );
+
+      return {
+        ...donation,
+        distance: Number(distance.toFixed(2))
+      };
+    })
+    .filter(donation =>
+      donation !== null && donation.distance <= maxDistance
+    )
+    .sort((a, b) => a.distance - b.distance);
 }
 
 module.exports = {
-    geocodeAddress,
-    calculateDistance,
-    findNearbyDonations
+  geocodeAddress,
+  calculateDistance,
+  findNearbyDonations
 };

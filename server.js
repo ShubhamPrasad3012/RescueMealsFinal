@@ -7,9 +7,7 @@ var bodyParser = require('body-parser');
 var router     = express.Router();
 var appRoutes  = require('./routes/api.js')(router);
 var path       = require('path');
-var multer     = require('multer');
-var passport   = require('passport');
-var social     = require('./passport/passport.js')(app,passport);
+var multer     = require('multer');  
 
 app.use(morgan('dev'));
 

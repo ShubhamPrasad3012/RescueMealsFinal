@@ -6,35 +6,72 @@
         margin-left: 1vh;
     }
 </style>
+
 <div class="text-center">
-    <h1>
-        Donate Raw Items
-    </h1>
+    <h1>Donate Raw Items</h1>
 </div>
 <br>
+
 <div>
-    <form ng-submit="donateraw.addData(rawfoodData)">
+    <form ng-submit="donateraw.addData(donateraw.rawfoodData)">
+
         <label>Item Name :</label>
-        <input class="form-control" type="text" placeholder="Enter Item name" ng-model="donateraw.rawfoodData.name" required>
+        <input class="form-control"
+               type="text"
+               placeholder="Enter Item name"
+               ng-model="donateraw.rawfoodData.name"
+               required>
+
         <label>Item Quantity (In kg) :</label>
-        <input class="form-control" type="text" placeholder="Enter Item quantity" ng-model="donateraw.rawfoodData.quantity" required>
+        <input class="form-control"
+               type="number"
+               min="0.01"
+               step="any"
+               placeholder="Enter Item quantity"
+               ng-model="donateraw.rawfoodData.quantity"
+               required>
+
         <label>City :</label>
-        <input class="form-control" type="text" placeholder="Enter city" ng-model="donateraw.rawfoodData.city" required>
+        <input class="form-control"
+               type="text"
+               placeholder="Enter city"
+               ng-model="donateraw.rawfoodData.city"
+               required>
+
         <label>State :</label>
-        <input class="form-control" type="text" placeholder="Enter state" ng-model="donateraw.rawfoodData.state" required>
-        <button> Donate </button>
+        <input class="form-control"
+               type="text"
+               placeholder="Enter state"
+               ng-model="donateraw.rawfoodData.state"
+               required>
+
+        <label>Food Expiry Date and Time :</label>
+        <input class="form-control"
+               type="datetime-local"
+               ng-model="donateraw.rawfoodData.expiryDate"
+               required>
+
+        <br>
+        <button type="submit">Donate</button>
     </form>
-    <div class="jumbotron text-center" ng-show="donateraw.loading">
-        <span class="glyphicon glyphicon-request fa-spinner"></span>
+
+    <div class="jumbotron text-center"
+         ng-show="donateraw.loading">
+        <span class="glyphicon glyphicon-refresh fa-spinner"></span>
         <p>Loading....</p>
     </div>
 
-    <div class="row show-hide message" ng-show="donateraw.successMsg">
-        <div class="alert alert-success">{{donateraw.successMsg}}</div>
-
+    <div class="row show-hide message"
+         ng-show="donateraw.successMsg">
+        <div class="alert alert-success">
+            {{donateraw.successMsg}}
+        </div>
     </div>
 
-    <div class="row show-hide message" ng-show="donateraw.errorMsg">
-        <div class="alert alert-danger">{{donateraw.errorMsg}}</div>
+    <div class="row show-hide message"
+         ng-show="donateraw.errorMsg">
+        <div class="alert alert-danger">
+            {{donateraw.errorMsg}}
+        </div>
+    </div>
 </div>
-

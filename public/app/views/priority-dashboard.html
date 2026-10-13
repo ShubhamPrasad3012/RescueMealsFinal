@@ -1,0 +1,174 @@
+
+<div class="container" style="background:#f5f8f5; color:#183329;
+     padding:24px; border-radius:12px; margin-top:24px;">
+
+    <div class="row">
+        <div class="col-sm-8">
+            <h2>Priority Distribution Dashboard</h2>
+            <p>Ranked food donations and recommended recipients</p>
+        </div>
+        <div class="col-sm-4 text-right">
+            <button class="btn btn-success"
+                    ng-click="priorityDashboard.load()"
+                    ng-disabled="priorityDashboard.loading">
+                Refresh Matches
+            </button>
+        </div>
+    </div>
+
+    <div ng-if="priorityDashboard.loading" class="alert alert-info">
+        Loading priority matches...
+    </div>
+
+    <div ng-if="priorityDashboard.error" class="alert alert-danger">
+        {{priorityDashboard.error}}
+    </div>
+
+    <div ng-if="priorityDashboard.data">
+
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <p>Ranked Matches</p>
+                        <h2>{{priorityDashboard.data.counts.rankedMatches}}</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <p>Incomplete Matches</p>
+                        <h2>{{priorityDashboard.data.counts.incompleteMatches}}</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <p>Available Volunteers</p>
+                        <h2>{{priorityDashboard.data.counts.availableVolunteers}}</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <p>Recipients</p>
+                        <h2>{{priorityDashboard.data.counts.recipients}}</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h3>Donation Matches</h3>
+
+        <div ng-if="!priorityDashboard.matches.length"
+             class="alert alert-info">
+            No donation matches found.
+        </div>
+
+        <div class="panel panel-default"
+             ng-repeat="match in priorityDashboard.matches track by $index">
+
+            <div class="panel-heading">
+                <strong>{{match.donation.title}}</strong>
+
+                <span class="label"
+                      ng-class="{
+                        'label-danger': match.level === 'HIGH',
+                        'label-warning': match.level === 'MEDIUM',
+                        'label-success': match.level === 'NORMAL',
+                        'label-default': !match.level
+                      }">
+                    {{match.level || match.status}}
+                </span>
+            </div>
+
+            <div class="panel-body">
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <p><strong>Food type:</strong>
+                            {{match.donation.type}}</p>
+                        <p><strong>Quantity:</strong>
+                            {{match.donation.quantity}}
+                            {{match.donation.unit}}</p>
+                        <p><strong>Location:</strong>
+                            {{match.donation.city}},
+                            {{match.donation.state}}</p>
+                        <p><strong>Expiry:</strong>
+                            {{match.donation.expiryDate
+                              ? (match.donation.expiryDate | date:'medium')
+                              : 'Not available'}}</p>
+                    </div>
+
+                    <div class="col-sm-6">
+                        <p><strong>Recommended recipient:</strong>
+                            {{match.recipient.name || 'Not assigned'}}</p>
+                        <p><strong>Unmet demand:</strong>
+                            {{match.recipient.unmetDemand || 0}} meals</p>
+                        <p><strong>Distance:</strong>
+                            {{match.distanceKm}} km</p>
+                        <p><strong>Nearby volunteers:</strong>
+                            {{match.nearbyVolunteers}}</p>
+                    </div>
+                </div>
+
+                <div ng-if="match.score !== undefined">
+                    <h4>Priority Score: {{(match.score * 100) | number:2}}%</h4>
+
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-success"
+                             role="progressbar"
+                             ng-style="{width: (match.score * 100) + '%'}">
+                        </div>
+                    </div>
+
+                    <p><strong>Strongest factor:</strong>
+                        {{match.strongestFactor}}</p>
+
+                    <h4>Scoring factors</h4>
+
+                    <div ng-repeat="factor in [
+                        {key:'urgency', label:'Urgency'},
+                        {key:'demand', label:'Demand'},
+                        {key:'quantityFit', label:'Quantity fit'},
+                        {key:'proximity', label:'Proximity'},
+                        {key:'volunteerSupply', label:'Volunteer supply'}
+                    ]">
+                        <p>
+                            {{factor.label}}:
+                            {{(match.features[factor.key] * 100) | number:1}}%
+                        </p>
+                        <div class="progress">
+                            <div class="progress-bar"
+                                 ng-style="{
+                                   width: ((match.features[factor.key] || 0) * 100) + '%'
+                                 }">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-if="match.warning" class="alert alert-warning">
+                    {{match.warning}}
+                </div>
+
+                <div ng-if="match.status === 'ranked'"
+                     class="alert alert-info">
+                    Recipient recommendation generated. Volunteer assignment
+                    and delivery tracking will be added in a later phase.
+                </div>
+
+            </div>
+        </div>
+
+        <p class="text-muted">
+            Last updated: {{priorityDashboard.data.generatedAt | date:'medium'}}
+        </p>
+    </div>
+</div>
